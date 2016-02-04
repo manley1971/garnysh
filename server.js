@@ -1,3 +1,4 @@
+//of course this garnysh code is demo only
 'use strict';
 
 var express = require('express');

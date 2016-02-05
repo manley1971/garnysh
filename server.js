@@ -9,7 +9,7 @@ var session = require('express-session');
 var app = express();
 require('dotenv').load();
 
-mongoose.connect(process.env.MONGO_URI,function (err){if (err) console.log("error in connecting to mongo"));
+mongoose.connect(process.env.MONGO_URI,function (err){if (err) console.log("error in connecting to mongo")});
 console.log(process.env.MONGO_URI);
 
 var ServiceProviderSchema = new mongoose.Schema({

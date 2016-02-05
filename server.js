@@ -25,7 +25,7 @@ var ServiceProviderSchema = new mongoose.Schema({
   //  lastupdated:Timestamp
 });
 
-let sModel = mongoose.model('SearchList', ServiceProviderSchema);
+let sModel = mongoose.model('VendorList', ServiceProviderSchema);
 
 
 app.use('/controllers', express.static(process.cwd() + '/app/controllers'));
@@ -54,6 +54,7 @@ app.get('/add-vendor/:str', function(req, res) {
     let newVendor = new sModel({
         firstName: fields[0],
     });
+    console.log("Save this vendor");
     newVendor.save();
 
     let retval = { "status:":fields[0] };

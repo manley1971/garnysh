@@ -10,6 +10,7 @@ var app = express();
 require('dotenv').load();
 
 mongoose.connect(process.env.MONGO_URI);
+console.log(process.env.MONGO_URI);
 
 var ServiceProviderSchema = new mongoose.Schema({
     firstName: String,

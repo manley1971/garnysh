@@ -13,28 +13,62 @@ mongoose.connect(process.env.MONGO_URI,function (err){if (err) console.log("erro
 console.log(process.env.MONGO_URI);
 
 var ServiceProviderSchema = new mongoose.Schema({
+    providerNum:Number,
     firstName: String,
     lastName: String,
     foodType:String,
     phone:String,
     addr:String,
     menu:String,
-//    lat:Double,
-  //  lon:Double,
-    //averageUserRating:Double,
-//    created:Timestamp,
-  //  lastupdated:Timestamp
+    lat:Number,
+    lon:Number,
+    averageUserRating:Number,
+    createdTime : { type : Date, default: Date.now },
+    lastUpdatedTime : { type : Date, default: Date.now }
 });
 
 let sModel = mongoose.model('VendorList', ServiceProviderSchema);
-
-
-app.use('/controllers', express.static(process.cwd() + '/app/controllers'));
 app.use('/', express.static(process.cwd() + '/public'));
-app.use('/common', express.static(process.cwd() + '/app/common'));
-
-
 app.get('/get-vendors/:filter', function(req, res) {
+console.log("Filtering "+req.params.filter+" is not real refined yet.");
+   let filter = req.params.filter;
+//    if (filter == "veggie")
+    var q = sModel.find({"foodType":filter}, {
+        _id: 0,
+        __v: 0
+    });
+    q.exec(function(err, data) {
+        if (err) console.log("please send a mail to manley@stanford.org, he will be interested in the error..");
+        res.end(JSON.stringify(data));
+    });
+});
+
+
+//https://garnysh-manley1971.c9users.io/add-vendor/pmvp?firstName=David&lastName=Manley&foodType=veggie&lat=37.6719&lon=-121.7681&phone=4216265&addr=214Tourmaline&menu=SetMenu1
+app.get('/add-vendor/:str', function(req, res) {
+    let str = req.params.str;
+    let fields = str.split("?");
+    let newVendor = new sModel({
+        providerNum: req.query.providerNum,
+        firstName: req.query.firstName,
+        lastName: req.query.lastName,
+        foodType: req.query.foodType,
+        phone: req.query.phone,
+        addr: req.query.addr,
+        menu: req.query.menu,
+
+        lat: req.query.lat,
+        lon: req.query.lon,
+    });
+    console.log("Save record for"+req.query.firstName);
+    newVendor.save();
+
+    let retval = { "entered:":fields[0] };
+    res.send(JSON.stringify(retval));
+});
+
+//just get everything if no filter
+app.get('/get-vendors', function(req, res) {
    let filter = req.params.filter;
  
     let q = sModel.find({}, {
@@ -47,20 +81,6 @@ app.get('/get-vendors/:filter', function(req, res) {
     });
 });
 
-
-
-app.get('/add-vendor/:str', function(req, res) {
-    let str = req.params.str;
-    let fields = str.split("?");
-    let newVendor = new sModel({
-        firstName: fields[0],
-    });
-    console.log("Save this vendor");
-    newVendor.save();
-
-    let retval = { "status:":fields[0] };
-    res.send(JSON.stringify(retval));
-});
 
 var port = process.env.PORT || 8080;
 app.listen(port,  function () {
